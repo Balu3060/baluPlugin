@@ -1,0 +1,4 @@
+Online Status Changer
+9|Online Status Changer
+1|Enable Plugin|cl_online_status_enable
+8|Status Override (0-3)|cl_online_status_override|0|3
