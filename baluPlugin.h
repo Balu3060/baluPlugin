@@ -2,6 +2,8 @@
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/wrappers/includes.h"
 #include <filesystem>
+#include <map>
+#include <string>
 
 class baluPlugin : public BakkesMod::Plugin::BakkesModPlugin
 {
@@ -17,14 +19,16 @@ public:
     void LoadData();
 
 private:
-    float lastKnownMMR = -1.0f;
-    float sessionMMRChange = 0.0f;
-    int lastPlaylist = 0;
-    
     struct MMRData {
         int totalWins = 0;
         int totalLosses = 0;
         int streak = 0;
-    } stats;
-};
+        float sessionMMRChange = 0.0f;
+        float lastKnownMMR = -1.0f;
+    };
 
+    std::map<int, MMRData> playlistStats;
+    int currentPlaylist = 0;
+
+    std::string GetPlaylistName(int id);
+};
