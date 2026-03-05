@@ -2,8 +2,10 @@ MMR tracker By Baluuu._.
 9|MMR Tracker Settings
 1|Enable Plugin|mmr_enabled
 0|Reset Tracker Position|mmr_reset_pos
+0|Reset Stats|mmr_reset_stats
 1|Save Progress Locally|mmr_save_progress
-4|X Position|mmr_x_pos|0|2560
-4|Y Position|mmr_y_pos|0|1440
+6|Display Mode|mmr_display_mode|Ranked 1v1@10&Ranked 2v2@11&Ranked 3v3@13&Casual 1v1@1&Casual 2v2@2&Casual 3v3@3&Hoops@27&Rumble@28&Dropshot@29&Snow Day@30&Tournaments@34
+5|X Position|mmr_x_pos|0|2560
+5|Y Position|mmr_y_pos|0|1440
 4|UI Scale|mmr_scale|0.5|3.0
-4|Background Opacity|mmr_opacity|0|255
+5|Background Opacity|mmr_opacity|0|255
