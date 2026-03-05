@@ -32,6 +32,7 @@ void baluPlugin::onLoad()
     PollMMR();
 }
 
+
 void baluPlugin::onUnload()
 {
     SaveData();
@@ -208,5 +209,6 @@ void baluPlugin::Render(CanvasWrapper canvas)
     }
     canvas.DrawString(mmrText, scale, scale);
 }
+
 
 
