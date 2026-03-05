@@ -1,5 +1,9 @@
-Status Overrider
-9|Status Overrider Plugin
-1|Enable Plugin|cl_status_enable
-8|Status (0-3)|cl_status_override|0|3
-5|Custom Text|cl_status_string
+MMR tracker By Baluuu._.
+9|MMR Tracker Settings
+1|Enable Plugin|mmr_enabled
+0|Reset Tracker Position|mmr_reset_pos
+1|Save Progress Locally|mmr_save_progress
+4|X Position|mmr_x_pos|0|2560
+4|Y Position|mmr_y_pos|0|1440
+4|UI Scale|mmr_scale|0.5|3.0
+4|Background Opacity|mmr_opacity|0|255
