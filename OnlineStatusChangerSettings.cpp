@@ -1,5 +1,6 @@
 #include "OnlineStatusChanger.h"
 #include "imgui/imgui.h"
+#include <cstdio>
 
 void StatusOverrider::SetImGuiContext(uintptr_t ctx)
 {
@@ -35,8 +36,8 @@ void StatusOverrider::RenderSettings()
     if (!stringCvar) return;
 
     std::string textValue = stringCvar.getStringValue();
-    char buffer[256];
-    strncpy_s(buffer, sizeof(buffer), textValue.c_str(), _TRUNCATE);
+    static char buffer[256] = "";
+    snprintf(buffer, sizeof(buffer), "%s", textValue.c_str());
 
     if (ImGui::InputText("Custom Text", buffer, sizeof(buffer)))
     {
