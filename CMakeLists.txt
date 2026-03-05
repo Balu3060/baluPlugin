@@ -10,7 +10,7 @@ include_directories("${SDK_PATH}/include")
 link_directories("${SDK_PATH}/lib")
 
 add_library(${PROJECT_NAME} SHARED 
-    OnlineStatusChanger.cpp 
+    baluPlugin.cpp 
 )
 
 target_link_libraries(${PROJECT_NAME} pluginsdk)
