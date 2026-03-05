@@ -24,7 +24,7 @@ jobs:
       run: cmake --build build --config Release
 
     - name: Upload DLL Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: StatusOverrider-DLL
-        path: build/Release/StatusOverrider.dll
+    - uses: actions/upload-artifact@v4
+    with:
+      name: baluPlugin
+      path: build/Release/baluPlugin.dll
