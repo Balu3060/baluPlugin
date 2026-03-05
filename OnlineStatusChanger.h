@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include <functional>
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/pluginwindow.h"
 #include "bakkesmod/plugin/PluginSettingsWindow.h"
