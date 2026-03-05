@@ -1,4 +1,5 @@
 #include "OnlineStatusChanger.h"
+#include <cstdio>
 
 BAKKESMOD_PLUGIN(StatusOverrider, "MMR tracker By Baluuu._.", "1.0", 0)
 
@@ -13,8 +14,16 @@ void StatusOverrider::onLoad()
     cvarManager->registerCvar("mmr_rounding", "5", "Corner Rounding", true, true, 0, true, 50);
 
     gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", std::bind(&StatusOverrider::OnMatchEnd, this, std::placeholders::_1));
+    gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchStarted", std::bind(&StatusOverrider::OnMatchStart, this, std::placeholders::_1));
     
     gameWrapper->RegisterDrawable(std::bind(&StatusOverrider::Render, this, std::placeholders::_1));
+}
+
+void StatusOverrider::onUnload() {}
+
+void StatusOverrider::OnMatchStart(std::string eventName)
+{
+    UpdateMMR();
 }
 
 void StatusOverrider::OnMatchEnd(std::string eventName)
@@ -38,9 +47,34 @@ void StatusOverrider::OnMatchEnd(std::string eventName)
         stats.totalLosses++;
         stats.streak = (stats.streak > 0) ? -1 : stats.streak - 1;
     }
+
+    gameWrapper->SetTimeout([this](GameWrapper* gw) {
+        UpdateMMR();
+    }, 3.0f);
 }
 
-void StatusOverrider::onUnload() {}
+void StatusOverrider::UpdateMMR()
+{
+    MMRWrapper mmrWrapper = gameWrapper->GetMMRWrapper();
+    if (!mmrWrapper) return;
+
+    int playlist = mmrWrapper.GetCurrentPlaylist();
+    auto uid = gameWrapper->GetUniqueID();
+    if (!uid) return;
+
+    float currentMMR = mmrWrapper.GetPlayerMMR(uid, playlist);
+    if (currentMMR <= 0) return;
+
+    if (lastKnownMMR < 0) {
+        lastKnownMMR = currentMMR;
+    } else {
+        float change = currentMMR - lastKnownMMR;
+        if (change != 0) {
+            sessionMMRChange += change;
+            lastKnownMMR = currentMMR;
+        }
+    }
+}
 
 void StatusOverrider::Render(CanvasWrapper canvas)
 {
@@ -53,7 +87,7 @@ void StatusOverrider::Render(CanvasWrapper canvas)
 
     canvas.SetPosition(Vector2{x, y});
     canvas.SetColor(0, 0, 0, (char)opacity);
-    canvas.FillBox(Vector2{(int)(200 * scale), (int)(120 * scale)});
+    canvas.FillBox(Vector2{(int)(200 * scale), (int)(150 * scale)});
 
     canvas.SetPosition(Vector2{x + (int)(10 * scale), y + (int)(10 * scale)});
     canvas.SetColor(255, 255, 255, 255);
@@ -72,4 +106,14 @@ void StatusOverrider::Render(CanvasWrapper canvas)
     canvas.SetPosition(Vector2{x + (int)(10 * scale), y + (int)(95 * scale)});
     canvas.SetColor(255, 50, 50, 255);
     canvas.DrawString("Losses: " + std::to_string(stats.totalLosses), scale, scale);
+
+    canvas.SetPosition(Vector2{x + (int)(10 * scale), y + (int)(120 * scale)});
+    canvas.SetColor(0, 150, 255, 255);
+    char mmrText[64];
+    if (sessionMMRChange >= 0) {
+        snprintf(mmrText, sizeof(mmrText), "Session MMR: +%.1f", sessionMMRChange);
+    } else {
+        snprintf(mmrText, sizeof(mmrText), "Session MMR: %.1f", sessionMMRChange);
+    }
+    canvas.DrawString(mmrText, scale, scale);
 }
