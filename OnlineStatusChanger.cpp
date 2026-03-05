@@ -12,7 +12,7 @@ void StatusOverrider::onLoad()
     cvarManager->registerCvar("mmr_opacity", "150", "Bg Opacity", true, true, 0, true, 255);
     cvarManager->registerCvar("mmr_rounding", "5", "Corner Rounding", true, true, 0, true, 50);
 
-    gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchFinished", std::bind(&StatusOverrider::OnMatchEnd, this, std::placeholders::_1));
+    gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", std::bind(&StatusOverrider::OnMatchEnd, this, std::placeholders::_1));
     
     gameWrapper->RegisterDrawable(std::bind(&StatusOverrider::Render, this, std::placeholders::_1));
 }
@@ -22,13 +22,16 @@ void StatusOverrider::OnMatchEnd(std::string eventName)
     ServerWrapper server = gameWrapper->GetCurrentGameState();
     if (!server) return;
 
+    TeamWrapper winner = server.GetMatchWinner();
+    if (!winner) return;
+
     auto pri = gameWrapper->GetPlayerController().GetPRI();
     if (!pri) return;
 
     int team = pri.GetTeamNum();
-    int winner = server.GetMatchWinner().GetTeamNum();
+    int winnerTeam = winner.GetTeamNum();
 
-    if (team == winner) {
+    if (team == winnerTeam) {
         stats.totalWins++;
         stats.streak = (stats.streak < 0) ? 1 : stats.streak + 1;
     } else {
