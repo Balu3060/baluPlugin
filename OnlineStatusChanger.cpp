@@ -8,8 +8,8 @@ void StatusOverrider::onLoad()
 {
     cvarManager->registerCvar("mmr_enabled", "1", "", true, true, 0, true, 1);
     cvarManager->registerCvar("mmr_save_progress", "0", "", true, true, 0, true, 1);
-    cvarManager->registerCvar("mmr_x_pos", "100", "", true, true, 0, true, 2000);
-    cvarManager->registerCvar("mmr_y_pos", "100", "", true, true, 0, true, 2000);
+    cvarManager->registerCvar("mmr_x_pos", "100", "X Position", true, true, 0, false, 0);
+    cvarManager->registerCvar("mmr_y_pos", "100", "Y Position", true, true, 0, false, 0);
     cvarManager->registerCvar("mmr_scale", "1.0", "", true, true, 0.5, true, 5.0);
     cvarManager->registerCvar("mmr_opacity", "150", "", true, true, 0, true, 255);
     cvarManager->registerCvar("mmr_rounding", "5", "", true, true, 0, true, 50);
@@ -117,14 +117,21 @@ void StatusOverrider::Render(CanvasWrapper canvas)
 {
     if (!cvarManager->getCvar("mmr_enabled").getBoolValue()) return;
 
+    Vector2 screenRes = canvas.GetSize();
     int x = cvarManager->getCvar("mmr_x_pos").getIntValue();
     int y = cvarManager->getCvar("mmr_y_pos").getIntValue();
     float scale = cvarManager->getCvar("mmr_scale").getFloatValue();
     int opacity = cvarManager->getCvar("mmr_opacity").getIntValue();
 
+    // Prevent the box from being dragged completely off-screen
+    if (x > screenRes.X) x = screenRes.X - (int)(200 * scale);
+    if (y > screenRes.Y) y = screenRes.Y - (int)(150 * scale);
+
     canvas.SetPosition(Vector2{x, y});
     canvas.SetColor(0, 0, 0, (char)opacity);
     canvas.FillBox(Vector2{(int)(200 * scale), (int)(150 * scale)});
+
+    // ... rest of your drawing code remains the same ...
 
     canvas.SetPosition(Vector2{x + (int)(10 * scale), y + (int)(10 * scale)});
     canvas.SetColor(255, 255, 255, 255);
@@ -154,5 +161,6 @@ void StatusOverrider::Render(CanvasWrapper canvas)
     }
     canvas.DrawString(mmrText, scale, scale);
 }
+
 
 
