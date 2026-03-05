@@ -30,4 +30,16 @@ void StatusOverrider::RenderSettings()
     {
         statusCvar.setValue(statusValue);
     }
+
+    CVarWrapper stringCvar = cvarManager->getCvar("cl_status_string");
+    if (!stringCvar) return;
+
+    std::string textValue = stringCvar.getStringValue();
+    char buffer[256];
+    strncpy_s(buffer, sizeof(buffer), textValue.c_str(), _TRUNCATE);
+
+    if (ImGui::InputText("Custom Text", buffer, sizeof(buffer)))
+    {
+        stringCvar.setValue(std::string(buffer));
+    }
 }
