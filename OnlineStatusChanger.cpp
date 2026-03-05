@@ -56,11 +56,8 @@ void StatusOverrider::OnMatchEnd(std::string eventName)
 void StatusOverrider::UpdateMMR()
 {
     MMRWrapper mmrWrapper = gameWrapper->GetMMRWrapper();
-    if (!mmrWrapper) return;
-
     int playlist = mmrWrapper.GetCurrentPlaylist();
     auto uid = gameWrapper->GetUniqueID();
-    if (!uid) return;
 
     float currentMMR = mmrWrapper.GetPlayerMMR(uid, playlist);
     if (currentMMR <= 0) return;
@@ -117,3 +114,4 @@ void StatusOverrider::Render(CanvasWrapper canvas)
     }
     canvas.DrawString(mmrText, scale, scale);
 }
+
