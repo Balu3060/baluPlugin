@@ -5,25 +5,28 @@ BAKKESMOD_PLUGIN(StatusOverrider, "MMR tracker By Baluuu._.", "1.0", 0)
 
 void StatusOverrider::onLoad()
 {
-    cvarManager->registerCvar("mmr_enabled", "1", "Enable Tracker", true, true, 0, true, 1);
-    cvarManager->registerCvar("mmr_save_progress", "0", "Save across sessions", true, true, 0, true, 1);
-    cvarManager->registerCvar("mmr_x_pos", "100", "X Position", true, true, 0, true, 2000);
-    cvarManager->registerCvar("mmr_y_pos", "100", "Y Position", true, true, 0, true, 2000);
-    cvarManager->registerCvar("mmr_scale", "1.0", "Scale", true, true, 0.5, true, 5.0);
-    cvarManager->registerCvar("mmr_opacity", "150", "Bg Opacity", true, true, 0, true, 255);
-    cvarManager->registerCvar("mmr_rounding", "5", "Corner Rounding", true, true, 0, true, 50);
+    cvarManager->registerCvar("mmr_enabled", "1", "", true, true, 0, true, 1);
+    cvarManager->registerCvar("mmr_save_progress", "0", "", true, true, 0, true, 1);
+    cvarManager->registerCvar("mmr_x_pos", "100", "", true, true, 0, true, 2000);
+    cvarManager->registerCvar("mmr_y_pos", "100", "", true, true, 0, true, 2000);
+    cvarManager->registerCvar("mmr_scale", "1.0", "", true, true, 0.5, true, 5.0);
+    cvarManager->registerCvar("mmr_opacity", "150", "", true, true, 0, true, 255);
+    cvarManager->registerCvar("mmr_rounding", "5", "", true, true, 0, true, 50);
 
     gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", std::bind(&StatusOverrider::OnMatchEnd, this, std::placeholders::_1));
-    gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchStarted", std::bind(&StatusOverrider::OnMatchStart, this, std::placeholders::_1));
-    
     gameWrapper->RegisterDrawable(std::bind(&StatusOverrider::Render, this, std::placeholders::_1));
+
+    PollMMR();
 }
 
 void StatusOverrider::onUnload() {}
 
-void StatusOverrider::OnMatchStart(std::string eventName)
+void StatusOverrider::PollMMR()
 {
     UpdateMMR();
+    gameWrapper->SetTimeout([this](GameWrapper* gw) {
+        PollMMR();
+    }, 2.0f);
 }
 
 void StatusOverrider::OnMatchEnd(std::string eventName)
@@ -47,10 +50,6 @@ void StatusOverrider::OnMatchEnd(std::string eventName)
         stats.totalLosses++;
         stats.streak = (stats.streak > 0) ? -1 : stats.streak - 1;
     }
-
-    gameWrapper->SetTimeout([this](GameWrapper* gw) {
-        UpdateMMR();
-    }, 3.0f);
 }
 
 void StatusOverrider::UpdateMMR()
@@ -62,8 +61,9 @@ void StatusOverrider::UpdateMMR()
     float currentMMR = mmrWrapper.GetPlayerMMR(uid, playlist);
     if (currentMMR <= 0) return;
 
-    if (lastKnownMMR < 0) {
+    if (lastKnownMMR < 0 || playlist != lastPlaylist) {
         lastKnownMMR = currentMMR;
+        lastPlaylist = playlist;
     } else {
         float change = currentMMR - lastKnownMMR;
         if (change != 0) {
@@ -114,4 +114,3 @@ void StatusOverrider::Render(CanvasWrapper canvas)
     }
     canvas.DrawString(mmrText, scale, scale);
 }
-
