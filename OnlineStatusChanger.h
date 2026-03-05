@@ -9,13 +9,14 @@ public:
     virtual void onUnload() override;
 
     void OnMatchEnd(std::string eventName);
-    void OnMatchStart(std::string eventName);
     void UpdateMMR();
+    void PollMMR();
     void Render(CanvasWrapper canvas);
 
 private:
     float lastKnownMMR = -1.0f;
     float sessionMMRChange = 0.0f;
+    int lastPlaylist = 0;
     
     struct MMRData {
         int totalWins = 0;
