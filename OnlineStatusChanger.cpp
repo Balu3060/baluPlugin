@@ -1,5 +1,6 @@
 #include "OnlineStatusChanger.h"
 #include <cstdio>
+#include <fstream>
 
 BAKKESMOD_PLUGIN(StatusOverrider, "MMR tracker By Baluuu._.", "1.0", 0)
 
@@ -16,10 +17,38 @@ void StatusOverrider::onLoad()
     gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", std::bind(&StatusOverrider::OnMatchEnd, this, std::placeholders::_1));
     gameWrapper->RegisterDrawable(std::bind(&StatusOverrider::Render, this, std::placeholders::_1));
 
+    LoadData();
     PollMMR();
 }
 
-void StatusOverrider::onUnload() {}
+void StatusOverrider::onUnload()
+{
+    SaveData();
+}
+
+void StatusOverrider::SaveData()
+{
+    if (!cvarManager->getCvar("mmr_save_progress").getBoolValue()) return;
+    
+    std::filesystem::path saveFile = gameWrapper->GetDataFolder() / "mmr_tracker_save.txt";
+    std::ofstream out(saveFile);
+    if (out.is_open()) {
+        out << stats.totalWins << " " << stats.totalLosses << " " << stats.streak << " " << sessionMMRChange;
+        out.close();
+    }
+}
+
+void StatusOverrider::LoadData()
+{
+    if (!cvarManager->getCvar("mmr_save_progress").getBoolValue()) return;
+
+    std::filesystem::path saveFile = gameWrapper->GetDataFolder() / "mmr_tracker_save.txt";
+    std::ifstream in(saveFile);
+    if (in.is_open()) {
+        in >> stats.totalWins >> stats.totalLosses >> stats.streak >> sessionMMRChange;
+        in.close();
+    }
+}
 
 void StatusOverrider::PollMMR()
 {
@@ -50,6 +79,8 @@ void StatusOverrider::OnMatchEnd(std::string eventName)
         stats.totalLosses++;
         stats.streak = (stats.streak > 0) ? -1 : stats.streak - 1;
     }
+    
+    SaveData();
 }
 
 void StatusOverrider::UpdateMMR()
@@ -69,6 +100,7 @@ void StatusOverrider::UpdateMMR()
         if (change != 0) {
             sessionMMRChange += change;
             lastKnownMMR = currentMMR;
+            SaveData();
         }
     }
 }
