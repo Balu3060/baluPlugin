@@ -14,4 +14,4 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} pluginsdk)
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "StatusOverrider")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "baluPlugin")
