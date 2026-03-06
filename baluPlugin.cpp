@@ -219,15 +219,37 @@ void baluPlugin::Render(CanvasWrapper canvas)
     if (mmrNeeded > 0) {
         canvas.SetColor(255, 215, 0, 255);
         char nextRankText[64];
-        snprintf(nextRankText, sizeof(nextRankText), "until next division: %.1f mmr", mmrNeeded);
+        snprintf(nextRankText, sizeof(nextRankText), "untill next rank: %.1f mmr", mmrNeeded);
         canvas.DrawString(nextRankText, scale, scale);
     } else {
         canvas.SetColor(150, 150, 150, 255);
-        canvas.DrawString("until next division: N/A", scale, scale);
+        canvas.DrawString("untill next rank: N/A", scale, scale);
     }
+
+
 }
 
 
+float baluPlugin::GetMMRNeededForNextRank(int playlist, float currentMMR) {
+    if (playlist != 11) return -1.0f;
+
+    std::vector<float> thresholds = {
+        119, 138, 157, 168, 179, 198, 217, 229, 239, 258, 277, 
+        293, 299, 318, 337, 352, 359, 378, 397, 411, 419, 438, 457, 
+        472, 479, 498, 517, 532, 539, 558, 577, 586, 599, 618, 637, 
+        641, 659, 678, 697, 706, 719, 738, 757, 764, 779, 798, 817, 
+        827, 844, 868, 892, 914, 924, 948, 972, 993, 1004, 1028, 1052, 
+        1075, 1094, 1128, 1162, 1195, 1214, 1248, 1282, 1314, 1334, 1368, 1402, 
+        1435, 1462, 1498, 1537, 1575, 1601, 1642, 1677, 1715, 1745, 1788, 1832, 1861
+    };
+
+    for (float t : thresholds) {
+        if (currentMMR < t) {
+            return t - currentMMR;
+        }
+    }
+    return -1.0f;
+}
 
 
 
