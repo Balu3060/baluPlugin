@@ -208,7 +208,25 @@ void baluPlugin::Render(CanvasWrapper canvas)
         snprintf(mmrText, sizeof(mmrText), "Session MMR: %.1f", data.sessionMMRChange);
     }
     canvas.DrawString(mmrText, scale, scale);
+
+    float mmrNeeded = -1.0f;
+    if (data.lastKnownMMR >= 0) {
+        mmrNeeded = GetMMRNeededForNextRank(displayPlaylist, data.lastKnownMMR);
+    }
+
+    canvas.SetPosition(Vector2{x + (int)(10 * scale), y + (int)(170 * scale)});
+    
+    if (mmrNeeded > 0) {
+        canvas.SetColor(255, 215, 0, 255);
+        char nextRankText[64];
+        snprintf(nextRankText, sizeof(nextRankText), "until next division: %.1f mmr", mmrNeeded);
+        canvas.DrawString(nextRankText, scale, scale);
+    } else {
+        canvas.SetColor(150, 150, 150, 255);
+        canvas.DrawString("until next division: N/A", scale, scale);
+    }
 }
+
 
 
 
